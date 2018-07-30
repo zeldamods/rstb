@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
 # Copyright 2018 leoetlino <leo@leolam.fr>
-# Licensed under MIT
+# Licensed under GPLv2+
 
 import argparse
-import json
 import sys
 import typing
 
-import rstb
-import rstb_util
+from . import rstb
+from . import util
 
 def parse_size(size_str: str, be: bool) -> int:
     try:
@@ -34,7 +32,7 @@ def rstb_del(args, table: rstb.ResourceSizeTable) -> None:
         sys.stderr.write('%s: not in table\n' % args.name)
         sys.exit(1)
     table.delete_entry(args.name)
-    rstb_util.write_rstb(table, args.rstb, args.be)
+    util.write_rstb(table, args.rstb, args.be)
 
 def rstb_set(args, table: rstb.ResourceSizeTable) -> None:
     if not table.is_in_table(args.name):
@@ -46,7 +44,7 @@ def rstb_set(args, table: rstb.ResourceSizeTable) -> None:
     print('%s: current size is %d bytes (0x%08x)' % (args.name, old_size, old_size))
     print('%s: new size is %d bytes (0x%08x)' % (args.name, new_size, new_size))
     table.set_size(args.name, new_size)
-    rstb_util.write_rstb(table, args.rstb, args.be)
+    util.write_rstb(table, args.rstb, args.be)
 
 def rstb_add(args, table: rstb.ResourceSizeTable) -> None:
     if table.is_in_table(args.name):
@@ -56,7 +54,7 @@ def rstb_add(args, table: rstb.ResourceSizeTable) -> None:
     new_size = parse_size(args.size, args.be)
     print('%s: new size is %d bytes (0x%08x)' % (args.name, new_size, new_size))
     table.set_size(args.name, new_size)
-    rstb_util.write_rstb(table, args.rstb, args.be)
+    util.write_rstb(table, args.rstb, args.be)
 
 def rstb_compare(args, table: rstb.ResourceSizeTable) -> None:
     if not table.is_in_table(args.name):
@@ -68,7 +66,7 @@ def rstb_compare(args, table: rstb.ResourceSizeTable) -> None:
     print('%s:     listed size is %d bytes (0x%08x)' % (args.name, listed_size, listed_size))
     print('%s: calculated size is %d bytes (0x%08x)' % (args.name, calculated_size, calculated_size))
 
-if __name__ == '__main__':
+def main() -> None:
     parser = argparse.ArgumentParser(description='A tool to manipulate the RSTB (Resource Size TaBle).')
     parser.add_argument('rstb', help='Path to a Breath of the Wild RSTB (yaz0 compressed)')
     parser.add_argument('-b', '--be', action='store_true', help='Use big endian. Defaults to false.')
@@ -100,5 +98,5 @@ if __name__ == '__main__':
     calc_parser.set_defaults(func=rstb_compare)
 
     args = parser.parse_args()
-    table = rstb_util.read_rstb(args.rstb, args.be)
+    table = util.read_rstb(args.rstb, args.be)
     args.func(args, table)

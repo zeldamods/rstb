@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
 # Copyright 2018 leoetlino <leo@leolam.fr>
-# Licensed under MIT
+# Licensed under GPLv2+
 
 import binascii
 import csv
@@ -8,7 +7,7 @@ import os
 import struct
 import typing
 
-import yaz0_util
+import wszst_yaz0
 
 def _get_unpack_endian_character(big_endian: bool):
     return '>' if big_endian else '<'
@@ -181,7 +180,7 @@ class SizeCalculator:
         if info.is_complex:
             if actual_ext not in _factory_parsers:
                 return 0
-            file_data = yaz0_util.decompress_file(file_name)
+            file_data = wszst_yaz0.decompress_file(file_name)
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
             size += info.size_wiiu
