@@ -8,11 +8,11 @@ import typing
 from . import rstb
 from . import util
 
-def parse_size(size_str: str, be: bool) -> int:
+def parse_size(size_str: str, be: bool, force: bool) -> int:
     try:
         return int(size_str, 0)
     except ValueError:
-        size = rstb.SizeCalculator().calculate_file_size(file_name=size_str, wiiu=be)
+        size = rstb.SizeCalculator().calculate_file_size(file_name=size_str, wiiu=be, force=force)
         if not size:
             sys.stderr.write('error: could not calculate size because the resource factory allocates extra memory depending on the resource contents\n')
             sys.stderr.write('Unless you know what you are doing, it is recommended to just delete the entry from the RSTB for now.\n')
@@ -40,7 +40,7 @@ def rstb_set(args, table: rstb.ResourceSizeTable) -> None:
         sys.exit(1)
 
     old_size = table.get_size(args.name)
-    new_size = parse_size(args.size, args.be)
+    new_size = parse_size(args.size, args.be, force=args.force)
     print('%s: current size is %d bytes (0x%08x)' % (args.name, old_size, old_size))
     print('%s: new size is %d bytes (0x%08x)' % (args.name, new_size, new_size))
     table.set_size(args.name, new_size)
@@ -51,7 +51,7 @@ def rstb_add(args, table: rstb.ResourceSizeTable) -> None:
         sys.stderr.write('%s: already in table\n' % args.name)
         sys.exit(3)
 
-    new_size = parse_size(args.size, args.be)
+    new_size = parse_size(args.size, args.be, args.ignore_unknown)
     print('%s: new size is %d bytes (0x%08x)' % (args.name, new_size, new_size))
     table.set_size(args.name, new_size)
     util.write_rstb(table, args.rstb, args.be)
@@ -62,7 +62,7 @@ def rstb_compare(args, table: rstb.ResourceSizeTable) -> None:
         sys.exit(1)
 
     listed_size = table.get_size(args.name)
-    calculated_size = parse_size(args.file, be=args.be)
+    calculated_size = parse_size(args.file, be=args.be, force=True)
     print('%s:     listed size is %d bytes (0x%08x)' % (args.name, listed_size, listed_size))
     print('%s: calculated size is %d bytes (0x%08x)' % (args.name, calculated_size, calculated_size))
 
@@ -81,6 +81,7 @@ def main() -> None:
     set_parser = subparsers.add_parser('set', description='Edit an existing entry in the table')
     set_parser.add_argument('name', help='Resource name')
     set_parser.add_argument('size', help='Resource size (integer or file path for auto size detection)')
+    set_parser.add_argument('--force', action='store_true', help='Do not warn when the resource size cannot be determined because the factory is complex. WARNING: this will likely cause the game to crash.')
     set_parser.set_defaults(func=rstb_set)
 
     add_parser = subparsers.add_parser('add', description='Add a new entry to the table')

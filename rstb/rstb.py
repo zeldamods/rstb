@@ -162,7 +162,7 @@ class SizeCalculator:
     def get_factory_info(self) -> typing.Dict[str, Factory]:
         return self._factory_info
 
-    def calculate_file_size_with_ext(self, file_name: str, wiiu: bool, ext: str) -> int:
+    def calculate_file_size_with_ext(self, file_name: str, wiiu: bool, ext: str, force: bool = False) -> int:
         size = 0
         if ext.startswith('.s'):
             with open(file_name, 'rb') as f:
@@ -178,26 +178,30 @@ class SizeCalculator:
         info = self._factory_info.get(actual_ext, self._factory_info['*'])
         file_data = bytes()
         if info.is_complex:
-            if actual_ext not in _factory_parsers:
+            if actual_ext not in _factory_parsers and not force:
                 return 0
             file_data = wszst_yaz0.decompress_file(file_name)
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
             size += info.size_wiiu
-            if info.is_complex:
+            if actual_ext not in _factory_parsers:
+                size += 0
+            elif info.is_complex:
                 size += _factory_parsers[actual_ext].parse_wiiu(file_data)
             else:
                 size += info.parse_size_wiiu
         else:
             size += 0x168
             size += info.size_nx
-            if info.is_complex:
+            if actual_ext not in _factory_parsers:
+                size += 0
+            elif info.is_complex:
                 size += _factory_parsers[actual_ext].parse_nx(file_data)
             else:
                 size += info.parse_size_nx
 
         return size
 
-    def calculate_file_size(self, file_name: str, wiiu: bool) -> int:
+    def calculate_file_size(self, file_name: str, wiiu: bool, force: bool = False) -> int:
         name_without_ext, ext = os.path.splitext(file_name)
-        return self.calculate_file_size_with_ext(file_name, wiiu, ext)
+        return self.calculate_file_size_with_ext(file_name, wiiu, ext, force)
