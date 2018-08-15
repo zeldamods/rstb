@@ -101,3 +101,6 @@ def main() -> None:
     args = parser.parse_args()
     table = util.read_rstb(args.rstb, args.be)
     args.func(args, table)
+
+if __name__ == '__main__':
+    main()
