@@ -190,6 +190,12 @@ class SizeCalculator:
                 size += _factory_parsers[actual_ext].parse_wiiu(file_data)
             else:
                 size += info.parse_size_wiiu
+
+            if actual_ext == 'beventpack':
+                size += 0xe0
+
+            if actual_ext == 'bfevfl':
+                size += 0x58
         else:
             size += 0x168
             size += info.size_nx
