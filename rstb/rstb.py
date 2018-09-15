@@ -162,14 +162,17 @@ class SizeCalculator:
     def get_factory_info(self) -> typing.Dict[str, Factory]:
         return self._factory_info
 
-    def calculate_file_size_with_ext(self, file_name: str, wiiu: bool, ext: str, force: bool = False) -> int:
+    def calculate_file_size_with_ext(self, file: typing.Union[str, bytes], wiiu: bool, ext: str, force: bool = False) -> int:
         size = 0
-        if ext.startswith('.s'):
-            with open(file_name, 'rb') as f:
-                f.seek(4)
-                size = _read_u32(f.read(4), offset=0, be=True)
-        else:
-            size = os.path.getsize(file_name)
+        if isinstance(file, str):
+            if ext.startswith('.s'):
+                with open(file, 'rb') as f:
+                    f.seek(4)
+                    size = _read_u32(f.read(4), offset=0, be=True)
+            else:
+                size = os.path.getsize(file)
+        elif isinstance(file, bytes):
+            size = len(file)
 
         # Round up the file size to the nearest multiple of 32.
         size = (size + 31) & -32
@@ -180,7 +183,10 @@ class SizeCalculator:
         if info.is_complex:
             if actual_ext not in _factory_parsers and not force:
                 return 0
-            file_data = wszst_yaz0.decompress_file(file_name)
+            if isinstance(file, str):
+                file_data = wszst_yaz0.decompress_file(file)
+            elif isinstance(file, bytes):
+                file_data = wszst_yaz0.decompress(file)
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
             size += info.size_wiiu
