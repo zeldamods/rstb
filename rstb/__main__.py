@@ -51,7 +51,7 @@ def rstb_add(args, table: rstb.ResourceSizeTable) -> None:
         sys.stderr.write('%s: already in table\n' % args.name)
         sys.exit(3)
 
-    new_size = parse_size(args.size, args.be, args.ignore_unknown)
+    new_size = parse_size(args.size, args.be, args.force)
     print('%s: new size is %d bytes (0x%08x)' % (args.name, new_size, new_size))
     table.set_size(args.name, new_size)
     util.write_rstb(table, args.rstb, args.be)
