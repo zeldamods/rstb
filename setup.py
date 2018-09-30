@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rstb",
-    version="1.0.3",
+    version="1.1.0",
     author="leoetlino",
     author_email="leo@leolam.fr",
     description="Breath of the Wild RSTB parser and editing tool",
