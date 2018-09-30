@@ -66,6 +66,15 @@ def rstb_compare(args, table: rstb.ResourceSizeTable) -> None:
     print('%s:     listed size is %d bytes (0x%08x)' % (args.name, listed_size, listed_size))
     print('%s: calculated size is %d bytes (0x%08x)' % (args.name, calculated_size, calculated_size))
 
+def rstb_dump(args, table: rstb.ResourceSizeTable) -> None:
+    print(f'{len(table.crc32_map)} entries in CRC32 map')
+    print(f'{len(table.name_map)} entries in name map')
+    print()
+    for crc32, size in table.crc32_map.items():
+        print(f'c {crc32:08x} {size}')
+    for name, size in table.name_map.items():
+        print(f'n {name:128s} {size}')
+
 def main() -> None:
     parser = argparse.ArgumentParser(description='A tool to manipulate the RSTB (Resource Size TaBle).')
     parser.add_argument('rstb', help='Path to a Breath of the Wild RSTB (yaz0 compressed)')
@@ -97,6 +106,9 @@ def main() -> None:
     calc_parser.add_argument('name', help='Resource name')
     calc_parser.add_argument('file', help='Host file path to resource')
     calc_parser.set_defaults(func=rstb_compare)
+
+    dump_parser = subparsers.add_parser('dump', description='Dump entries to a text format')
+    dump_parser.set_defaults(func=rstb_dump)
 
     args = parser.parse_args()
     table = util.read_rstb(args.rstb, args.be)
