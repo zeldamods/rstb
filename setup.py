@@ -1,12 +1,14 @@
 import fastentrypoints
 import setuptools
+import versioneer
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="rstb",
-    version="1.1.1",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     author="leoetlino",
     author_email="leo@leolam.fr",
     description="Breath of the Wild RSTB parser and editing tool",

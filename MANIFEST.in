@@ -1,2 +1,4 @@
 include rstb/resource_factory_info.tsv
 include fastentrypoints.py
+include versioneer.py
+include rstb/_version.py
