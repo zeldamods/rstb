@@ -90,7 +90,6 @@ def main() -> None:
     set_parser = subparsers.add_parser('set', description='Edit an existing entry in the table')
     set_parser.add_argument('name', help='Resource name')
     set_parser.add_argument('size', help='Resource size (integer or file path for auto size detection)')
-    set_parser.add_argument('--force', action='store_true', help='Do not warn when the resource size cannot be determined because the factory is complex. WARNING: this will likely cause the game to crash.')
     set_parser.set_defaults(func=rstb_set)
 
     add_parser = subparsers.add_parser('add', description='Add a new entry to the table')
@@ -109,6 +108,9 @@ def main() -> None:
 
     dump_parser = subparsers.add_parser('dump', description='Dump entries to a text format')
     dump_parser.set_defaults(func=rstb_dump)
+
+    for p in (add_parser, set_parser):
+        p.add_argument('--force', action='store_true', help='Do not warn when the resource size cannot be determined because the factory is complex. WARNING: this will likely cause the game to crash.')
 
     args = parser.parse_args()
     table = util.read_rstb(args.rstb, args.be)
