@@ -24,7 +24,7 @@ setuptools.setup(
         "Topic :: Software Development :: Libraries",
     ],
     python_requires='>=3.6',
-    install_requires=['wszst_yaz0~=1.0'],
+    install_requires=['syaz0~=1.0'],
     entry_points = {
         'console_scripts': [
             'rstbtool = rstb.__main__:main',
