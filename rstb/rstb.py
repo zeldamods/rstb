@@ -162,8 +162,10 @@ class SizeCalculator:
     def get_factory_info(self) -> typing.Dict[str, Factory]:
         return self._factory_info
 
-    def calculate_file_size_with_ext(self, file: typing.Union[str, bytes], wiiu: bool, ext: str, force: bool = False) -> int:
+    def calculate_file_size_with_ext(self, file: typing.Union[str, os.PathLike, bytes], wiiu: bool, ext: str, force: bool = False) -> int:
         size = 0
+        if isinstance(file, os.PathLike):
+            file = str(file)
         if isinstance(file, str):
             if ext.startswith('.s'):
                 with open(file, 'rb') as f:
@@ -214,6 +216,9 @@ class SizeCalculator:
 
         return size
 
-    def calculate_file_size(self, file_name: str, wiiu: bool, force: bool = False) -> int:
-        name_without_ext, ext = os.path.splitext(file_name)
+    def calculate_file_size(self, file_name: typing.Union[str, os.PathLike], wiiu: bool, force: bool = False) -> int:
+        if isinstance(file_name, os.PathLike):
+            ext = file_name.suffix
+        else:
+            name_without_ext, ext = os.path.splitext(file_name)
         return self.calculate_file_size_with_ext(file_name, wiiu, ext, force)
