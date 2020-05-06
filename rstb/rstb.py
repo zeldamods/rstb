@@ -171,7 +171,7 @@ class SizeCalculator:
                     size = _read_u32(f.read(4), offset=0, be=True)
             else:
                 size = os.path.getsize(file)
-        elif isinstance(file, bytes):
+        else:
             size = len(file)
 
         # Round up the file size to the nearest multiple of 32.
@@ -185,7 +185,7 @@ class SizeCalculator:
                 return 0
             if isinstance(file, str):
                 file_data = syaz0.decompress(open(file, 'rb').read())
-            elif isinstance(file, bytes):
+            else:
                 file_data = syaz0.decompress(file)
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
