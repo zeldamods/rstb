@@ -218,7 +218,10 @@ class SizeCalculator:
 
     def calculate_file_size(self, file_name: typing.Union[str, os.PathLike], wiiu: bool, force: bool = False) -> int:
         if isinstance(file_name, os.PathLike):
-            ext = file_name.suffix
+            try:
+                ext = file_name.suffix
+            except AttributeError:
+                name_without_ext, ext = os.path.splitext(str(file_name))
         else:
             name_without_ext, ext = os.path.splitext(file_name)
         return self.calculate_file_size_with_ext(file_name, wiiu, ext, force)
