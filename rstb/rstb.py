@@ -162,7 +162,7 @@ class SizeCalculator:
     def get_factory_info(self) -> typing.Dict[str, Factory]:
         return self._factory_info
 
-    def calculate_file_size_with_ext(self, file: typing.Union[str, os.PathLike, bytes], wiiu: bool, ext: str, force: bool = False) -> int:
+    def calculate_file_size_with_ext(self, file: typing.Union[str, os.PathLike, typing.ByteString], wiiu: bool, ext: str, force: bool = False) -> int:
         size = 0
         if isinstance(file, os.PathLike):
             file = str(file)
