@@ -162,8 +162,10 @@ class SizeCalculator:
     def get_factory_info(self) -> typing.Dict[str, Factory]:
         return self._factory_info
 
-    def calculate_file_size_with_ext(self, file: typing.Union[str, bytes], wiiu: bool, ext: str, force: bool = False) -> int:
+    def calculate_file_size_with_ext(self, file: typing.Union[str, os.PathLike, typing.ByteString], wiiu: bool, ext: str, force: bool = False) -> int:
         size = 0
+        if isinstance(file, os.PathLike):
+            file = str(file)
         if isinstance(file, str):
             if ext.startswith('.s'):
                 with open(file, 'rb') as f:
@@ -171,7 +173,7 @@ class SizeCalculator:
                     size = _read_u32(f.read(4), offset=0, be=True)
             else:
                 size = os.path.getsize(file)
-        elif isinstance(file, bytes):
+        else:
             size = len(file)
 
         # Round up the file size to the nearest multiple of 32.
@@ -185,7 +187,7 @@ class SizeCalculator:
                 return 0
             if isinstance(file, str):
                 file_data = syaz0.decompress(open(file, 'rb').read())
-            elif isinstance(file, bytes):
+            else:
                 file_data = syaz0.decompress(file)
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
@@ -214,6 +216,12 @@ class SizeCalculator:
 
         return size
 
-    def calculate_file_size(self, file_name: str, wiiu: bool, force: bool = False) -> int:
-        name_without_ext, ext = os.path.splitext(file_name)
+    def calculate_file_size(self, file_name: typing.Union[str, os.PathLike], wiiu: bool, force: bool = False) -> int:
+        if isinstance(file_name, os.PathLike):
+            try:
+                ext = file_name.suffix
+            except AttributeError:
+                name_without_ext, ext = os.path.splitext(str(file_name))
+        else:
+            name_without_ext, ext = os.path.splitext(file_name)
         return self.calculate_file_size_with_ext(file_name, wiiu, ext, force)
