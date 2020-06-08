@@ -119,15 +119,6 @@ class ResourceSizeTable:
                 return True
         return False
 
-class _FactoryParser:
-    def parse_nx(self, data: bytes) -> int:
-        pass
-    def parse_wiiu(self, data: bytes) -> int:
-        pass
-
-_factory_parsers: typing.Dict[str, _FactoryParser] = {
-}
-
 class SizeCalculator:
     class Factory:
         size_nx: int
@@ -183,7 +174,7 @@ class SizeCalculator:
         info = self._factory_info.get(actual_ext, self._factory_info['*'])
         file_data = bytes()
         if info.is_complex:
-            if actual_ext not in _factory_parsers and not force:
+            if not force:
                 return 0
             if isinstance(file, str):
                 file_data = syaz0.decompress(open(file, 'rb').read())
@@ -192,12 +183,7 @@ class SizeCalculator:
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
             size += info.size_wiiu
-            if actual_ext not in _factory_parsers:
-                size += 0
-            elif info.is_complex:
-                size += _factory_parsers[actual_ext].parse_wiiu(file_data)
-            else:
-                size += info.parse_size_wiiu
+            size += info.parse_size_wiiu
 
             if actual_ext == 'beventpack':
                 size += 0xe0
@@ -207,12 +193,7 @@ class SizeCalculator:
         else:
             size += 0x168
             size += info.size_nx
-            if actual_ext not in _factory_parsers:
-                size += 0
-            elif info.is_complex:
-                size += _factory_parsers[actual_ext].parse_nx(file_data)
-            else:
-                size += info.parse_size_nx
+            size += info.parse_size_nx
 
         return size
 
