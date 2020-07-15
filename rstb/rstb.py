@@ -176,10 +176,13 @@ class SizeCalculator:
         if info.is_complex:
             if not force:
                 return 0
-            if isinstance(file, str):
-                file_data = syaz0.decompress(open(file, 'rb').read())
+            if isinstance(file, bytes):
+                file_data = file
             else:
-                file_data = syaz0.decompress(file)
+                with open(str(file), 'rb') as f:
+                    file_data = f.read()
+            if file_data[0:4] == b'Yaz0':
+                file_data = syaz0.decompress(file_data)
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
             size += info.size_wiiu
