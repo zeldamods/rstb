@@ -7,7 +7,7 @@ import os
 import struct
 import typing
 
-import syaz0
+import oead.yaz0
 
 def _get_unpack_endian_character(big_endian: bool):
     return '>' if big_endian else '<'
@@ -182,7 +182,7 @@ class SizeCalculator:
                 with open(str(file), 'rb') as f:
                     file_data = f.read()
             if file_data[0:4] == b'Yaz0':
-                file_data = syaz0.decompress(file_data)
+                file_data = oead.yaz0.decompress(file_data)
         if wiiu:
             size += 0xe4 # res::ResourceMgr constant. Not sure what it is.
             size += info.size_wiiu
